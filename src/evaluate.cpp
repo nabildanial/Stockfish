@@ -395,6 +395,11 @@ namespace {
     // King shelter and enemy pawns storm
     Score score = ei.pi->king_safety<Us>(pos, ksq);
 
+    // King opposition
+    if (  !pos.non_pawn_material(Them)
+        && distance(ksq, pos.king_square(Them)) == 2)
+            score += (pos.side_to_move() == Us ? Score(8) : Score(-8));
+
     // Main king safety evaluation
     if (ei.kingAttackersCount[Them])
     {
