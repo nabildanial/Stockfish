@@ -245,14 +245,18 @@ namespace {
     // Initial bonus based on square
     Value bonus = Outpost[Pt == BISHOP][relative_square(Us, s)];
 
-    // Increase bonus if supported by pawn, especially if the opponent has
-    // no minor piece which can trade with the outpost piece.
-    if (bonus && (ei.attackedBy[Us][PAWN] & s))
+    // Increase bonus if supported by pawn or knight by knight, especially if
+    // the opponent has no minor piece which can trade with the outpost piece.
+    if (bonus)
     {
-        if (   !pos.pieces(Them, KNIGHT)
-            && !(squares_of_color(s) & pos.pieces(Them, BISHOP)))
-            bonus += bonus + bonus / 2;
-        else
+        if (ei.attackedBy[Us][PAWN] & s)
+        {
+            if (   !pos.pieces(Them, KNIGHT)
+                && !(squares_of_color(s) & pos.pieces(Them, BISHOP)))
+                bonus += bonus + bonus / 2;
+            else
+                bonus += bonus / 2;
+        } else if (Pt == KNIGHT && (ei.attackedBy[Us][KNIGHT] & s))
             bonus += bonus / 2;
     }
 
