@@ -580,7 +580,7 @@ namespace {
 
             // Do verification search at high depths
             ss->skipNullMove = true;
-            Value v = search<NonPV, false>(pos, ss, beta-1, beta, depth-5*ONE_PLY, false);
+            Value v = search<NonPV, false>(pos, ss, beta-1, beta, depth-(R -= 5 * ONE_PLY), false);
             ss->skipNullMove = false;
 
             if (v >= beta)
