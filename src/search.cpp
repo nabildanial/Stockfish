@@ -640,7 +640,8 @@ namespace {
         return eval - futility_margin(depth);
 
     // Step 8. Null move search with verification search (is omitted in PV nodes)
-    if (   !PvNode
+    if (   false
+        && !PvNode
         &&  depth >= 2 * ONE_PLY
         &&  eval >= beta
         &&  pos.non_pawn_material(pos.side_to_move()))
@@ -830,7 +831,8 @@ moves_loop: // When in check and at SpNode search starts from here
       newDepth = depth - ONE_PLY + extension;
 
       // Step 13. Pruning at shallow depth (exclude PV nodes)
-      if (   !PvNode
+      if (   false
+          && !PvNode
           && !captureOrPromotion
           && !inCheck
           && !dangerous
