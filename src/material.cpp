@@ -58,8 +58,11 @@ namespace {
   // the function maps because they correspond to more than one material hash key.
   Endgame<KXK>   EvaluateKXK[]   = { Endgame<KXK>(WHITE),   Endgame<KXK>(BLACK) };
 
-  Endgame<KBPsK>  ScaleKBPsK[]  = { Endgame<KBPsK>(WHITE),  Endgame<KBPsK>(BLACK) };
+  Endgame<KBPKPs> ScaleKBPKPs[]  = { Endgame<KBPKPs>(WHITE),  Endgame<KBPKPs>(BLACK) };
   Endgame<KQKRPs> ScaleKQKRPs[] = { Endgame<KQKRPs>(WHITE), Endgame<KQKRPs>(BLACK) };
+  Endgame<KQKBN>  ScaleKQKBN[]  = { Endgame<KQKBN>(WHITE),  Endgame<KQKBN>(BLACK)};
+  Endgame<KQKBB>  ScaleKQKBB[]  = { Endgame<KQKBB>(WHITE),  Endgame<KQKBB>(BLACK)};
+  Endgame<KQKNN>  ScaleKQKNN[]  = { Endgame<KQKNN>(WHITE),  Endgame<KQKNN>(BLACK)};
   Endgame<KPsK>   ScaleKPsK[]   = { Endgame<KPsK>(WHITE),   Endgame<KPsK>(BLACK) };
   Endgame<KPKP>   ScaleKPKP[]   = { Endgame<KPKP>(WHITE),   Endgame<KPKP>(BLACK) };
 
@@ -70,7 +73,7 @@ namespace {
           && pos.non_pawn_material(Us) >= RookValueMg;
   }
 
-  template<Color Us> bool is_KBPsKs(const Position& pos) {
+  template<Color Us> bool is_KBPKPs(const Position& pos) {
     return   pos.non_pawn_material(Us) == BishopValueMg
           && pos.count<BISHOP>(Us) == 1
           && pos.count<PAWN  >(Us) >= 1;
@@ -84,6 +87,32 @@ namespace {
           && pos.count<ROOK>(Them) == 1
           && pos.count<PAWN>(Them) >= 1;
   }
+
+    template<Color Us> bool is_KQKBN(const Position& pos) {
+    const Color Them = (Us == WHITE ? BLACK : WHITE);
+    return  !pos.count<PAWN>(Us)
+          && pos.non_pawn_material(Us) == QueenValueMg
+          && pos.count<QUEEN>(Us)  == 1
+          && pos.count<BISHOP>(Them) >= 1
+          && pos.count<KNIGHT>(Them) >= 1;
+  }
+
+    template<Color Us> bool is_KQKBB(const Position& pos) {
+    const Color Them = (Us == WHITE ? BLACK : WHITE);
+    return  !pos.count<PAWN>(Us)
+          && pos.non_pawn_material(Us) == QueenValueMg
+          && pos.count<QUEEN>(Us)  == 1
+          && pos.count<BISHOP>(Them) >= 2;
+  }
+
+    template<Color Us> bool is_KQKNN(const Position& pos) {
+    const Color Them = (Us == WHITE ? BLACK : WHITE);
+    return  !pos.count<PAWN>(Us)
+          && pos.non_pawn_material(Us) == QueenValueMg
+          && pos.count<QUEEN>(Us)  == 1
+          && pos.count<KNIGHT>(Them) >= 2;
+  }
+
 
   /// imbalance() calculates the imbalance by comparing the piece count of each
   /// piece type for both colors.
@@ -172,17 +201,36 @@ Entry* probe(const Position& pos, Table& entries, Endgames& endgames) {
   // Generic scaling functions that refer to more than one material
   // distribution. They should be probed after the specialized ones.
   // Note that these ones don't return after setting the function.
-  if (is_KBPsKs<WHITE>(pos))
-      e->scalingFunction[WHITE] = &ScaleKBPsK[WHITE];
+  if (is_KBPKPs<WHITE>(pos))
+      e->scalingFunction[WHITE] = &ScaleKBPKPs[WHITE];
 
-  if (is_KBPsKs<BLACK>(pos))
-      e->scalingFunction[BLACK] = &ScaleKBPsK[BLACK];
+  if (is_KBPKPs<BLACK>(pos))
+      e->scalingFunction[BLACK] = &ScaleKBPKPs[BLACK];
 
   if (is_KQKRPs<WHITE>(pos))
       e->scalingFunction[WHITE] = &ScaleKQKRPs[WHITE];
 
   else if (is_KQKRPs<BLACK>(pos))
       e->scalingFunction[BLACK] = &ScaleKQKRPs[BLACK];
+
+  if (is_KQKBN<WHITE>(pos))
+      e->scalingFunction[WHITE] = &ScaleKQKBN[WHITE];
+
+  else if (is_KQKBN<BLACK>(pos))
+      e->scalingFunction[BLACK] = &ScaleKQKBN[BLACK];
+
+  if (is_KQKBB<WHITE>(pos))
+      e->scalingFunction[WHITE] = &ScaleKQKBB[WHITE];
+
+  else if (is_KQKBB<BLACK>(pos))
+      e->scalingFunction[BLACK] = &ScaleKQKBB[BLACK];
+
+  if (is_KQKNN<WHITE>(pos))
+      e->scalingFunction[WHITE] = &ScaleKQKNN[WHITE];
+
+  else if (is_KQKNN<BLACK>(pos))
+      e->scalingFunction[BLACK] = &ScaleKQKNN[BLACK];
+
 
   Value npm_w = pos.non_pawn_material(WHITE);
   Value npm_b = pos.non_pawn_material(BLACK);
