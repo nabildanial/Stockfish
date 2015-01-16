@@ -617,6 +617,7 @@ namespace {
     // Step 6. Razoring (skipped when in check)
     if (   !PvNode
         &&  depth < 4 * ONE_PLY
+        &&  abs(eval) < VALUE_MATE_IN_MAX_PLY
         &&  eval + razor_margin(depth) <= alpha
         &&  ttMove == MOVE_NONE
         && !pos.pawn_on_7th(pos.side_to_move()))
@@ -642,6 +643,7 @@ namespace {
     // Step 8. Null move search with verification search
     if (   depth >= 2 * ONE_PLY
         && eval >= beta
+        && abs(eval) < VALUE_MATE_IN_MAX_PLY
         && pos.non_pawn_material(pos.side_to_move()))
     {
         ss->currentMove = MOVE_NULL;
@@ -667,6 +669,9 @@ namespace {
             if (depth < 12 * ONE_PLY && abs(beta) < VALUE_KNOWN_WIN)
                 return nullValue;
 
+            if (MoveList<KING_MOVES>(pos).size() < 1 || MoveList<LEGAL>(pos).size() < 6)
+                R = DEPTH_ZERO;
+
             // Do verification search at high depths
             ss->skipEarlyPruning = true;
             Value v = depth-R < ONE_PLY ? qsearch<NonPV, false>(pos, ss, beta-1, beta, DEPTH_ZERO)
@@ -684,6 +689,7 @@ namespace {
     // prune the previous move.
     if (   !PvNode
         &&  depth >= 5 * ONE_PLY
+        &&  abs(eval) < VALUE_MATE_IN_MAX_PLY
         &&  abs(beta) < VALUE_MATE_IN_MAX_PLY)
     {
         Value rbeta = std::min(beta + 200, VALUE_INFINITE);
